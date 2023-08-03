@@ -1,4 +1,6 @@
+const { MongoClient } = require('mongodb');
 const bcrypt = require('bcrypt');
+const config = require('../config');
 
 const {
   requireAuth,
@@ -9,7 +11,7 @@ const {
   getUsers,
 } = require('../controller/users');
 
-const initAdminUser = (app, next) => {
+const initAdminUser = async (app, next) => {
   const { adminEmail, adminPassword } = app.get('config');
   if (!adminEmail || !adminPassword) {
     return next();
@@ -18,16 +20,35 @@ const initAdminUser = (app, next) => {
   const adminUser = {
     email: adminEmail,
     password: bcrypt.hashSync(adminPassword, 10),
-    roles: { admin: true },
+    role: 'admin',
   };
 
   // TODO: crear usuaria admin
-  // Primero ver si ya existe adminUser en base de datos
-  // si no existe, hay que guardarlo
 
-  next();
+  try {
+    const client = new MongoClient(config.dbUrl);
+    await client.connect();
+    const db = client.db();
+
+    // Verificar si el usuario administrador ya existe en la base de datos
+    const existingAdmin = await db.collection('users').findOne({ email: adminUser.email });
+
+    if (!existingAdmin) {
+      // Si no existe, crear el usuario administrador
+      await db.collection('users').insertOne(adminUser);
+      // console.log('Prueba');
+    }
+
+    // Cerrar la conexión después de completar las operaciones
+    client.close();
+
+    // Llamar a la función next() después de completar las operaciones
+    next();
+  } catch (error) {
+    console.error('Error al conectar a la base de datos o al crear/buscar el usuario administrador:', error);
+    throw error;
+  }
 };
-
 /*
  * Diagrama de flujo de una aplicación y petición en node - express :
  *

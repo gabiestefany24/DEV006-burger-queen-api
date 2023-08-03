@@ -1,4 +1,6 @@
+const { MongoClient } = require('mongodb');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const config = require('../config');
 
 const { secret } = config;
@@ -17,7 +19,7 @@ module.exports = (app, nextMain) => {
    * @code {400} si no se proveen `email` o `password` o ninguno de los dos
    * @auth No requiere autenticación
    */
-  app.post('/auth', (req, resp, next) => {
+  app.post('/auth', async (req, resp, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -25,10 +27,29 @@ module.exports = (app, nextMain) => {
     }
 
     // TODO: autenticar a la usuarix
-    // Hay que confirmar si el email y password
-    // coinciden con un user en la base de datos
-    // Si coinciden, manda un access token creado con jwt
+    const client = new MongoClient(config.dbUrl);
+    await client.connect();
+    const db = client.db();
 
+    // confirmar si el email y password coinciden con un user en la base de datos
+    const user = await db.collection('users').findOne({ email });
+    if (!user) {
+      return next(400);
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return next(400);
+    }
+
+    // Si coinciden, manda un access token creado con jwt
+    const accessToken = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role },
+      secret,
+      { expiresIn: '1h' }, // Puedes ajustar el tiempo de expiración según tus necesidades
+    );
+    console.log(user.role);
+    resp.status(200).json({ accessToken });
     next();
   });
 
