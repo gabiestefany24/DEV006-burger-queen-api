@@ -1,0 +1,6 @@
+GET http://localhost:8080/auth
+
+### para enviar un post
+
+POST http://localhost:8080/users
+

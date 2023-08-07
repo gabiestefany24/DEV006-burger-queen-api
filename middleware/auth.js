@@ -19,23 +19,40 @@ module.exports = (secret) => (req, resp, next) => {
     }
 
     // TODO: Verificar identidad del usuario usando `decodeToken.uid`
+    // if (!decodedToken.userId) {
+    //   return next(403);
+    // }
+
+    // agrega id del usuario al objeto req para que los siguientes middlewares puedan acceder a él
+    req.userId = decodedToken.userId;
+    req.role = decodedToken.role;
+    req.email = decodedToken.email;
+    //  console.log(req.userId);
+
+    // Llama a `next()` para pasar al siguiente middleware
+    next();
   });
 };
 
 module.exports.isAuthenticated = (req) => (
   // TODO: decidir por la informacion del request si la usuaria esta autenticada
-  false
+  !!req.userId
+
+  // false
 );
+console.log('entra aqui')
 
 module.exports.isAdmin = (req) => (
   // TODO: decidir por la informacion del request si la usuaria es admin
-  false
+  req.role === 'admin'
+  // false
 );
 
 module.exports.requireAuth = (req, resp, next) => (
   (!module.exports.isAuthenticated(req))
     ? next(401)
     : next()
+
 );
 
 module.exports.requireAdmin = (req, resp, next) => (
@@ -45,4 +62,5 @@ module.exports.requireAdmin = (req, resp, next) => (
     : (!module.exports.isAdmin(req))
       ? next(403)
       : next()
+
 );
