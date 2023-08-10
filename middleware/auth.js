@@ -40,7 +40,6 @@ module.exports.isAuthenticated = (req) => (
 
   // false
 );
-console.log('entra aqui')
 
 module.exports.isAdmin = (req) => (
   // TODO: decidir por la informacion del request si la usuaria es admin

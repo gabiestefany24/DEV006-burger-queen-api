@@ -43,13 +43,13 @@ module.exports = (app, nextMain) => {
     }
 
     // Si coinciden, manda un access token creado con jwt
-    const accessToken = jwt.sign(
+    const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       secret,
       { expiresIn: '1h' }, // Puedes ajustar el tiempo de expiración según tus necesidades
     );
     console.log(user.role);
-    resp.status(200).json({ accessToken });
+    resp.status(200).json({ token });
     next();
   });
 

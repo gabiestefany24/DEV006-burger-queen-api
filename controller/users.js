@@ -47,7 +47,7 @@ module.exports = {
       const result = await usersCollection.insertOne(credentials);
       console.log('usuario nuevo en base de datos');
 
-      resp.status(201).json({ Id: result.insertedId, email, role });
+      resp.status(200).json({ Id: result.insertedId, email, role });
     } catch (error) {
       next(error);
     }

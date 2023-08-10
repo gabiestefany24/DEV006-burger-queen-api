@@ -21,6 +21,7 @@ const __e2e = {
   testUserCredentials: {
     email: 'test@test.test',
     password: '123456',
+    role: 'modelo'
   },
   testUserToken: null,
   childProcessPid: null,
@@ -149,6 +150,10 @@ module.exports = () => new Promise((resolve, reject) => {
         kill(child.pid, 'SIGKILL', () => reject(err));
       })
     }).catch((error)=> console.log(error));
+  waitForServerToBeReady()
+       .then(checkAdminCredentials)
+       .then(createTestUser)
+       .then(resolve)
 });
 
 // Export globals - ugly... :-(
