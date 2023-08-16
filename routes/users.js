@@ -9,7 +9,10 @@ const {
 
 const {
   getUsers,
+  getUserId,
+  patchUserId,
   postUsers,
+  deleteUserId,
 } = require('../controller/users');
 
 const initAdminUser = async (app, next) => {
@@ -117,8 +120,7 @@ module.exports = (app, next) => {
    * @code {403} si no es ni admin o la misma usuaria
    * @code {404} si la usuaria solicitada no existe
    */
-  app.get('/users/:uid', requireAuth, (req, resp) => {
-  });
+  app.get('/users/:uid', requireAuth, getUserId);
 
   /**
    * @name POST /users
@@ -143,7 +145,7 @@ module.exports = (app, next) => {
   // TODO: implementar la ruta para agregar
   // nuevos usuarios
   /**
-   * @name PUT /users
+   * @name PATCH /users
    * @description Modifica una usuaria
    * @params {String} :uid `id` o `email` de la usuaria a modificar
    * @path {PUT} /users
@@ -164,8 +166,7 @@ module.exports = (app, next) => {
    * @code {403} una usuaria no admin intenta de modificar sus `roles`
    * @code {404} si la usuaria solicitada no existe
    */
-  app.put('/users/:uid', requireAuth, (req, resp, next) => {
-  });
+  app.patch('/users/:uid', requireAuth, patchUserId);
 
   /**
    * @name DELETE /users
@@ -183,8 +184,7 @@ module.exports = (app, next) => {
    * @code {403} si no es ni admin o la misma usuaria
    * @code {404} si la usuaria solicitada no existe
    */
-  app.delete('/users/:uid', requireAuth, (req, resp, next) => {
-  });
+  app.delete('/users/:uid', requireAuth, deleteUserId);
 
   initAdminUser(app, next);
 };
