@@ -67,7 +67,11 @@ module.exports = {
         { returnOriginal: false },
       );
       console.log('Usuario actualizado');
-      resp.status(200).json(userPatchId.value);
+      resp.status(200).json({
+        id: userPatchId.value._id,
+        email: updatedData.email,
+        role: updatedData.role,
+      });
     } catch (error) {
       resp.status(404).json({
         error: 'Usuario no actualizado',
@@ -129,5 +133,5 @@ module.exports = {
 
       console.log('Usuario no eliminado');
     }
-  }
+  },
 };
